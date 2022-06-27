@@ -1,0 +1,34 @@
+## Synthetic population pipeline for Île-de-France
+## based on the synpp package
+
+# This is the path to a directory where the pipeline can store temporary data
+working_directory: /home/asallard/Dokumente/Projects/Scenarii/Île-de-France/cache
+
+# This section defines which parts of the pipeline should be run
+run:
+  - data.hts.entd.cleaned_long_distances # To create the output population in the output_path (see below)
+  #- matsim.output # Uncomment, if you want to run the full simulation (you'll need Java for that)
+
+# Here the configuraiton of the pipeline starts
+config:
+  # Some general configuration
+  processes: 4
+
+  # Define whether to use ENTD or EGT as the household travel survey (HTS)
+  hts: entd
+
+  # Define sampling rate and random seed for the output population
+  sampling_rate: 0.001
+  random_seed: 1234
+
+  # Paths to the input data and where the output should be stored
+  data_path: /home/asallard/Dokumente/Projects/Scenarii/Île-de-France/Data
+  output_path: /home/asallard/Dokumente/Projects/Scenarii/Île-de-France/output
+
+  # Only interesting if you run the simulation
+  java_memory: 14G
+
+  # Uncommented below to enable vehicle fleet generation
+  # generate_vehicles_file: True
+  # generate_vehicles_method: fleet_sample
+  # vehicles_data_year: 2015
