@@ -270,7 +270,7 @@ def execute(context):
         ] = mode
     
     # Fixing preceding purpose
-    df_trips.loc[1: , "purpose_previous_trip"] = df_trips["following_purpose"][:len(df_trips)-1]
+    df_trips.loc[: , "purpose_previous_trip"] = ["  "] + df_trips["following_purpose"][:len(df_trips)-1].values.tolist()
     df_trips.loc[:, "preceding_purpose"] = df_trips["purpose_previous_trip"]
     df_trips.loc[df_trips["is_first_trip"], "preceding_purpose"] = "home"
     
@@ -279,7 +279,7 @@ def execute(context):
         "entd_person_id", "person_id", "household_id",
         "trip_weight", "trip_id", "is_first_trip", "is_last_trip",
         "departure_day", "return_day", "departure_time", "arrival_time", "trip_duration", "activity_duration",
-        "routed_distance", "mode", "preceding_purpose", "following_purpose", "purpose_previous_trip",
+        "routed_distance", "mode", "preceding_purpose", "following_purpose", 
         "origin_departement_id", "destination_departement_id",
         "vacation_main_purpose", "vacation_main_mode"
     ]]
