@@ -14,15 +14,15 @@ INCOME_CLASS_BOUNDS = [400, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500, 3000, 
 
 PURPOSE_MAP = [
     ("1", "home"),
-    ("1.11", "education"),
+    ("1.11", "school_trip"),
     ("2", "shop"),
     ("3", "other"),
     ("4", "other"),
     ("5", "visits"),
     ("6", "other"),
-    ("7", "leisure"),
+    ("7", "holiday"),
     ("8", "holiday"),
-    ("9", "work")
+    ("9", "business")
 ]
 
 MODES_MAP = [
@@ -33,12 +33,12 @@ MODES_MAP = [
     ("2.25", "car_passenger"), # same
     ("3", "car"),
     ("3.32", "car_passenger"),
-    ("4", "pt"), # taxi
-    ("5", "pt"),
-    ("6", "pt"),
-    ("7", "pt"), # Plane
-    ("8", "pt"), # Boat
-#    ("9", "pt") # Other
+    ("4", "pt_taxi"), # taxi
+    ("5", "pt_regional"),
+    ("6", "pt_LongDistanceTrains"),
+    ("7", "pt_Airplane"), # Plane
+    ("8", "pt_boat"), # Boat
+#    ("9", "pt_other") # Other
 ]
 
 def convert_time(x):

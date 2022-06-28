@@ -82,6 +82,9 @@ def execute(context):
     df_work = df_persons[df_persons["has_work_trip"]]
     df_education = df_persons[df_persons["has_education_trip"]]
 
+    if len(df_education) == 0 and len(df_work) == 0:
+        return
+
     # Attach home locations
     df_home = context.stage("synthesis.population.spatial.home.locations")
 

@@ -12,7 +12,10 @@ def configure(context):
     if context.config("generate_vehicles_file", False):
         context.stage("synthesis.vehicles.selected")
 
-    context.stage("synthesis.population.spatial.locations")
+    if context.config("hts") != "entd_long_distances":
+        context.stage("synthesis.population.spatial.locations")
+    else:
+        context.stage("synthesis.population.spatial.locations_longDistance")
 
     context.stage("documentation.meta_output")
 
@@ -107,9 +110,15 @@ def execute(context):
         df_vehicles.to_csv("%s/%svehicles.csv" % (output_path, output_prefix), sep = ";", index = None)
 
     # Prepare spatial data sets
-    df_locations = context.stage("synthesis.population.spatial.locations")[[
-        "person_id", "activity_index", "geometry"
-    ]]
+    if context.config("hts") != "entd_long_distances":
+        df_locations = context.stage("synthesis.population.spatial.locations")[[
+            "person_id", "activity_index", "geometry"
+        ]]
+    else:
+        df_locations = context.stage("synthesis.population.spatial.locations_longDistance")[[
+            "person_id", "activity_index", "geometry"
+        ]]
+
 
     df_activities = pd.merge(df_activities, df_locations[[
         "person_id", "activity_index", "geometry"

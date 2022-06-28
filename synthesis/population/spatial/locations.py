@@ -12,7 +12,7 @@ def configure(context):
 
 def execute(context):
     df_home = context.stage("synthesis.population.spatial.home.locations")
-    df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
+    #df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
     df_secondary = context.stage("synthesis.population.spatial.secondary.locations")[0]
 
     df_persons = context.stage("synthesis.population.sampled")[["person_id", "household_id"]]
@@ -26,16 +26,16 @@ def execute(context):
     df_home_locations = df_home_locations[["person_id", "activity_index", "location_id", "geometry"]]
 
     # Work locations
-    df_work_locations = df_locations[df_locations["purpose"] == "work"]
-    df_work_locations = pd.merge(df_work_locations, df_work[["person_id", "location_id", "geometry"]], on = "person_id")
-    df_work_locations = df_work_locations[["person_id", "activity_index", "location_id", "geometry"]]
-    assert not df_work_locations["geometry"].isna().any()
+    #df_work_locations = df_locations[df_locations["purpose"] == "work"]
+    #df_work_locations = pd.merge(df_work_locations, df_work[["person_id", "location_id", "geometry"]], on = "person_id")
+    #df_work_locations = df_work_locations[["person_id", "activity_index", "location_id", "geometry"]]
+    #assert not df_work_locations["geometry"].isna().any()
 
     # Education locations
-    df_education_locations = df_locations[df_locations["purpose"] == "education"]
-    df_education_locations = pd.merge(df_education_locations, df_education[["person_id", "location_id", "geometry"]], on = "person_id")
-    df_education_locations = df_education_locations[["person_id", "activity_index", "location_id", "geometry"]]
-    assert not df_education_locations["geometry"].isna().any()
+    #df_education_locations = df_locations[df_locations["purpose"] == "education"]
+    #df_education_locations = pd.merge(df_education_locations, df_education[["person_id", "location_id", "geometry"]], on = "person_id")
+    #df_education_locations = df_education_locations[["person_id", "activity_index", "location_id", "geometry"]]
+    #assert not df_education_locations["geometry"].isna().any()
 
     # Secondary locations
     df_secondary_locations = df_locations[~df_locations["purpose"].isin(("home", "work", "education"))].copy()

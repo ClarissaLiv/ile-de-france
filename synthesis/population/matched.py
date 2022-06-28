@@ -17,6 +17,7 @@ population sample. This is done by statistical matching.
 INCOME_CLASS = {
     "egt": data.hts.egt.cleaned.calculate_income_class,
     "entd": data.hts.entd.cleaned.calculate_income_class,
+    "entd_long_distances": data.hts.entd.cleaned.calculate_income_class,
 }
 
 def configure(context):

@@ -3,6 +3,7 @@ import numpy as np
 
 def configure(context):
     context.config("random_seed")
+    context.config("hts")
     context.stage("data.hts.selected")
 
 def get_commuting_distance(df_persons, df_trips, activity_type, random):
@@ -59,6 +60,10 @@ def get_commuting_distance(df_persons, df_trips, activity_type, random):
 def execute(context):
     df_households, df_persons, df_trips = context.stage("data.hts.selected")
     random = np.random.RandomState(context.config("random_seed"))
+
+    hts_version = context.config("hts")
+    if hts_version == "entd_long_distances":
+        return
 
     return dict(
         work = get_commuting_distance(df_persons, df_trips, "work", random),

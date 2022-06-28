@@ -11,6 +11,8 @@ def configure(context):
     context.stage("synthesis.population.enriched")
     context.stage("synthesis.population.trips")
 
+    context.config("hts")
+
     context.config("random_seed")
 
 def sample_destination_municipalities(context, arguments):
@@ -74,16 +76,17 @@ def process(context, purpose, random, df_persons, df_od, df_locations):
 
     df_flow = []
 
-    with context.progress(label = "Sampling %s municipalities" % purpose, total = len(df_demand)) as progress:
-        with context.parallel(dict(df_od = df_od)) as parallel:
-            for df_partial in parallel.imap_unordered(sample_destination_municipalities, df_demand.itertuples(index = False, name = None)):
-                df_flow.append(df_partial)
+    if context.config("hts") != "entd_long_distances":
+        with context.progress(label = "Sampling %s municipalities" % purpose, total = len(df_demand)) as progress:
+            with context.parallel(dict(df_od = df_od)) as parallel:
+                for df_partial in parallel.imap_unordered(sample_destination_municipalities, df_demand.itertuples(index = False, name = None)):
+                    df_flow.append(df_partial)
 
-    df_flow = pd.concat(df_flow)
+        df_flow = pd.concat(df_flow)
 
-    # Sample destinations based on the obtained flows
-    unique_ids = df_flow["destination_id"].unique()
-    random_seeds = random.randint(0, int(1e6), len(unique_ids))
+        # Sample destinations based on the obtained flows
+        unique_ids = df_flow["destination_id"].unique()
+        random_seeds = random.randint(0, int(1e6), len(unique_ids))
 
     df_result = []
 
@@ -120,19 +123,28 @@ def execute(context):
 
     df_locations = context.stage("synthesis.locations.work")
     df_locations["weight"] = df_locations["employees"]
-    df_work = process(context, "work", random, df_persons,
-        df_work_od, df_locations
-    )
 
-    df_locations = context.stage("synthesis.locations.education")
-    df_education = process(context, "education", random, df_persons,
-        df_education_od, df_locations
-    )
+    if context.config("hts") != "entd_long_distances":
+        df_work = process(context, "work", random, df_persons,
+            df_work_od, df_locations
+        )
 
-    return dict(
-        work_candidates = df_work,
-        education_candidates = df_education,
-        persons = df_persons[df_persons["has_work_trip"] | df_persons["has_education_trip"]][[
-            "person_id", "household_id", "commune_id", "has_work_trip", "has_education_trip"
-        ]]
-    )
+        df_locations = context.stage("synthesis.locations.education")
+        df_education = process(context, "education", random, df_persons,
+            df_education_od, df_locations
+        )
+
+        return dict(
+            work_candidates = df_work,
+            education_candidates = df_education,
+            persons = df_persons[df_persons["has_work_trip"] | df_persons["has_education_trip"]][[
+                "person_id", "household_id", "commune_id", "has_work_trip", "has_education_trip"
+            ]]
+        )
+
+    else:
+        return dict(
+            persons=df_persons[df_persons["has_work_trip"] | df_persons["has_education_trip"]][[
+                "person_id", "household_id", "commune_id", "has_work_trip", "has_education_trip"
+            ]]
+        )

@@ -4,7 +4,7 @@ import numpy as np
 
 def configure(context):
     context.stage("synthesis.population.spatial.home.locations")
-    context.stage("synthesis.population.spatial.primary.locations")
+    #context.stage("synthesis.population.spatial.primary.locations")
     context.stage("synthesis.population.spatial.secondary.locations_longDistance")
 
     context.stage("synthesis.population.activities")
@@ -12,7 +12,7 @@ def configure(context):
 
 def execute(context):
     df_home = context.stage("synthesis.population.spatial.home.locations")
-    df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
+    #df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
     df_secondary = context.stage("synthesis.population.spatial.secondary.locations_longDistance")[0]
 
     df_persons = context.stage("synthesis.population.sampled")[["person_id", "household_id"]]
@@ -26,16 +26,16 @@ def execute(context):
     df_home_locations = df_home_locations[["person_id", "activity_index", "location_id", "geometry"]]
 
     # Work locations
-    df_work_locations = df_locations[df_locations["purpose"] == "work"]
-    df_work_locations = pd.merge(df_work_locations, df_work[["person_id", "location_id", "geometry"]], on = "person_id")
-    df_work_locations = df_work_locations[["person_id", "activity_index", "location_id", "geometry"]]
-    assert not df_work_locations["geometry"].isna().any()
+    #df_work_locations = df_locations[df_locations["purpose"] == "work"]
+    #df_work_locations = pd.merge(df_work_locations, df_work[["person_id", "location_id", "geometry"]], on = "person_id")
+    #df_work_locations = df_work_locations[["person_id", "activity_index", "location_id", "geometry"]]
+    #assert not df_work_locations["geometry"].isna().any()
 
     # Education locations
-    df_education_locations = df_locations[df_locations["purpose"] == "education"]
-    df_education_locations = pd.merge(df_education_locations, df_education[["person_id", "location_id", "geometry"]], on = "person_id")
-    df_education_locations = df_education_locations[["person_id", "activity_index", "location_id", "geometry"]]
-    assert not df_education_locations["geometry"].isna().any()
+    #df_education_locations = df_locations[df_locations["purpose"] == "education"]
+    #df_education_locations = pd.merge(df_education_locations, df_education[["person_id", "location_id", "geometry"]], on = "person_id")
+    #df_education_locations = df_education_locations[["person_id", "activity_index", "location_id", "geometry"]]
+    #assert not df_education_locations["geometry"].isna().any()
 
     # Secondary locations
     df_secondary_locations = df_locations[~df_locations["purpose"].isin(("home", "work", "education"))].copy()
@@ -43,11 +43,16 @@ def execute(context):
         "person_id", "activity_index", "location_id", "geometry"
     ]], on = ["person_id", "activity_index"], how = "left")
     df_secondary_locations = df_secondary_locations[["person_id", "activity_index", "location_id", "geometry"]]
+    print(len(df_secondary_locations))
+    print(len(df_secondary_locations[df_secondary_locations["geometry"].isna()]))
+
+
     assert not df_secondary_locations["geometry"].isna().any()
 
     # Validation
     initial_count = len(df_locations)
-    df_locations = pd.concat([df_home_locations, df_work_locations, df_education_locations, df_secondary_locations])
+    #df_locations = pd.concat([df_home_locations, df_work_locations, df_education_locations, df_secondary_locations])
+    df_locations = pd.concat([df_home_locations, df_secondary_locations])
 
     df_locations = df_locations.sort_values(by = ["person_id", "activity_index"])
     final_count = len(df_locations)

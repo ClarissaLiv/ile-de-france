@@ -23,13 +23,13 @@ def configure(context):
 # Literature on long distance trips implies that restaurants, sports, culture, and hotels, etc., attract holiday trips - cvl 27.06.2022
 ACTIVITY_TYPE_MAP = [
     ("A", "PublicServicesEtc"),         # Police, post office, etc ...
-    ("A504", "vacation"),    # Restaurant
+    ("A504", "holiday"),    # Restaurant
     ("B", "Shopping"),          # Shopping
     ("C", "Education"),     # Education
     ("D", "Health"),         # Health
     ("E", "Transport"),         # Transport
-    ("F", "vacation"),       # Sports & Culture
-    ("G", "vacation"),         # Tourism, hotels, etc. (Hôtel = G102)
+    ("F", "holiday"),       # Sports & Culture
+    ("G", "holiday"),         # Tourism, hotels, etc. (Hôtel = G102)
 ]
 
 def find_outside(context, commune_id):

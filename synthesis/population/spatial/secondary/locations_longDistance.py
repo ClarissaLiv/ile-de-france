@@ -4,14 +4,14 @@ import multiprocessing as mp
 import shapely.geometry as geo
 import geopandas as gpd
 
-from synthesis.population.spatial.secondary.problems import find_assignment_problems
+from synthesis.population.spatial.secondary.problems_longDistance import find_assignment_problems
 
 def configure(context):
     context.stage("synthesis.population.trips")
 
     context.stage("synthesis.population.sampled")
     context.stage("synthesis.population.spatial.home.locations")
-    context.stage("synthesis.population.spatial.primary.locations")
+    #context.stage("synthesis.population.spatial.primary.locations")
 
     context.stage("synthesis.population.spatial.secondary.distance_distributions")
     context.stage("synthesis.locations.secondary_longDistance")
@@ -24,30 +24,31 @@ def configure(context):
 def prepare_locations(context):
     # Load persons and their primary locations
     df_home = context.stage("synthesis.population.spatial.home.locations")
-    df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
+    #df_work, df_education = context.stage("synthesis.population.spatial.primary.locations")
 
     df_home = df_home.rename(columns = { "geometry": "home" })
-    df_work = df_work.rename(columns = { "geometry": "work" })
-    df_education = df_education.rename(columns = { "geometry": "education" })
+    #df_work = df_work.rename(columns = { "geometry": "work" })
+    #df_education = df_education.rename(columns = { "geometry": "education" })
 
     df_locations = context.stage("synthesis.population.sampled")[["person_id", "household_id"]]
     df_locations = pd.merge(df_locations, df_home[["household_id", "home"]], how = "left", on = "household_id")
-    df_locations = pd.merge(df_locations, df_work[["person_id", "work"]], how = "left", on = "person_id")
-    df_locations = pd.merge(df_locations, df_education[["person_id", "education"]], how = "left", on = "person_id")
+    #df_locations = pd.merge(df_locations, df_work[["person_id", "work"]], how = "left", on = "person_id")
+    #df_locations = pd.merge(df_locations, df_education[["person_id", "education"]], how = "left", on = "person_id")
 
-    return df_locations[["person_id", "home", "work", "education"]].sort_values(by = "person_id")
+    #return df_locations[["person_id", "home", "work", "education"]].sort_values(by = "person_id")
+    return df_locations[["person_id", "home"]].sort_values(by="person_id")
 
 def prepare_destinations(context):
-    df_locations = context.stage("synthesis.locations.secondary")
+    df_locations = context.stage("synthesis.locations.secondary_longDistance")
 
     identifiers = df_locations["location_id"].values
     locations = np.vstack(df_locations["geometry"].apply(lambda x: np.array([x.x, x.y])).values)
 
     data = {}
 
-    for purpose in ("shop", "leisure", "other"):
+    for purpose in ("shop", "other", "holiday", "business", "visits", "school_trip"):
         f = df_locations["offers_%s" % purpose].values
-
+        print(purpose)
         data[purpose] = dict(
             identifiers = identifiers[f],
             locations = locations[f]
@@ -84,7 +85,8 @@ def execute(context):
 
     # Resampling for calibration
     resample_distributions(distance_distributions, dict(
-        car = 0.0, car_passenger = 0.1, pt = 0.5, bike = 0.0, walk = -0.5
+        car = 0.0, car_passenger = 0.1, pt = 0.5, bike = 0.0, walk = -0.5, pt_taxi = 0.0, pt_regional = 0.0,
+        pt_LongDistanceTrains = 0.0, pt_Airplane = 0.0, pt_boat = 0.0, pt_other = 0.0
     ))
 
     # Segment into subsamples
@@ -147,7 +149,9 @@ def process(context, arguments):
 
   # Set up relaxation solver; currently, we do not consider tail problems.
   chain_solver = GravityChainSolver(
-    random = random, eps = 10.0, lateral_deviation = 10.0, alpha = 0.1,
+    random = random, eps = 10.0,
+    lateral_deviation =  10.0,
+    alpha =0.1,
     maximum_iterations = min(1000, maximum_iterations)
     )
 
@@ -158,8 +162,9 @@ def process(context, arguments):
 
   # Set up assignment solver
   thresholds = dict(
-    car = 200.0, car_passenger = 200.0, pt = 200.0,
-    bike = 100.0, walk = 100.0
+    car = 2000.0, car_passenger = 2000.0, pt = 2000.0,
+    bike = 100.0, walk = 100.0, pt_taxi = 2000.0, pt_regional = 2000.0, pt_LongDistanceTrains = 30000.0,
+      pt_Airplane = 30000.0, pt_boat = 30000.0, pt_other = 30000.0
   )
 
   assignment_objective = DiscretizationErrorObjective(thresholds = thresholds)
