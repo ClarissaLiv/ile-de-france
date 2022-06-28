@@ -6,7 +6,7 @@ working_directory: /home/asallard/Dokumente/Projects/Scenarii/Île-de-France/cac
 
 # This section defines which parts of the pipeline should be run
 run:
-  - data.hts.entd.cleaned_long_distances # To create the output population in the output_path (see below)
+  - data.hts.selected # To create the output population in the output_path (see below)
   #- matsim.output # Uncomment, if you want to run the full simulation (you'll need Java for that)
 
 # Here the configuraiton of the pipeline starts
@@ -15,7 +15,7 @@ config:
   processes: 4
 
   # Define whether to use ENTD or EGT as the household travel survey (HTS)
-  hts: entd
+  hts: entd_long_distances
 
   # Define sampling rate and random seed for the output population
   sampling_rate: 0.001

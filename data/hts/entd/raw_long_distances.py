@@ -72,6 +72,8 @@ K_VOYAGE_DET_COLUMNS = [                                # Detailed description o
     "V2_OLDARH",                                        # Arrival hour
     "V2_OLDMOT",                                        # Purpose
     "V2_OLDMT1S",                                       # Mode
+    "V2_OLDARJ",                                        # Day of trip arrival
+    "V2_OLDDEJ"                                         # Day of trip departure
 ]
 
 def configure(context):

@@ -166,6 +166,75 @@ def check_trip_times(df_trips):
     else:
         print("  => All trip times are consistent!")
         return True
+        
+def check_trip_times_long_distances(df_trips):
+    print("Validating trip times...")
+    any_errors = False
+    df_next = df_trips.shift(-1)
+
+    f = df_trips["departure_time"] < 0.0
+    print("  Trips with negative departure time:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = df_trips["arrival_time"] < 0.0
+    print("  Trips with negative arrival time:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = df_trips["departure_time"] > df_trips["arrival_time"]
+    print("  Trips with negative duration:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["arrival_time"] > df_next["departure_time"]
+    print("  Trips that arrive after next departure:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["departure_time"] < df_next["departure_time"]
+    f &= df_trips["arrival_time"] > df_next["departure_time"]
+    f &= df_trips["arrival_time"] < df_next["arrival_time"]
+    print("  Trips that 'enter' following trip:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["departure_time"] > df_next["departure_time"]
+    f &= df_trips["arrival_time"] > df_next["arrival_time"]
+    f &= df_trips["departure_time"] < df_next["arrival_time"]
+    print("  Trips that 'exits' following trip", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["departure_time"] > df_next["departure_time"]
+    f &= df_trips["arrival_time"] > df_next["departure_time"]
+    f &= df_trips["departure_time"] < df_next["arrival_time"]
+    f &= df_trips["arrival_time"] < df_next["arrival_time"]
+    print("  Trips that 'are included in' following trip:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["departure_time"] < df_next["departure_time"]
+    f &= df_trips["arrival_time"] > df_next["arrival_time"]
+    print("  Trips that 'cover' following trip:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = ~df_trips["is_last_trip"]
+    f &= df_trips["departure_time"] > df_next["arrival_time"]
+    f &= df_trips["arrival_time"] > df_next["arrival_time"]
+    print("  Trips that 'are after' following trip:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    f = df_trips["departure_time"].isna()
+    f |= df_trips["arrival_time"].isna()
+    f |= df_trips["trip_duration"].isna()
+    print("  Trips that have NaN times:", np.count_nonzero(f))
+    any_errors |= np.count_nonzero(f) > 0
+
+    if any_errors:
+        print("  !!! Errors while validating trip times")
+        return False
+    else:
+        print("  => All trip times are consistent!")
+        return True
 
 def fix_activity_types(df_trips):
     f = (df_trips["preceding_purpose"] != df_trips["following_purpose"].shift(1)) & ~df_trips["is_first_trip"]
@@ -189,6 +258,15 @@ def compute_first_last(df_trips):
     df_trips = df_trips.sort_values(by = ["person_id", "trip_id"])
     df_trips["is_first_trip"] = df_trips["person_id"].ne(df_trips["person_id"].shift(1))
     df_trips["is_last_trip"] = df_trips["person_id"].ne(df_trips["person_id"].shift(-1))
+
+    return df_trips
+    
+def compute_first_last_long_distances(df_trips):
+    assert "vacation_id" in df_trips
+
+    df_trips = df_trips.sort_values(by = ["vacation_id", "departure_day", "departure_time"])
+    df_trips["is_first_trip"] = df_trips["vacation_id"].ne(df_trips["vacation_id"].shift(1))
+    df_trips["is_last_trip"] = df_trips["vacation_id"].ne(df_trips["vacation_id"].shift(-1))
 
     return df_trips
 
