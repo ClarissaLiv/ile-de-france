@@ -4,7 +4,7 @@ import pandas as pd
 import geopandas as gpd
 
 def configure(context):
-    context.stage("data.bpe.cleaned")
+    context.stage("data.bpe.cleaned_longDistance")
     context.stage("data.spatial.municipalities")
 
 def execute(context):
