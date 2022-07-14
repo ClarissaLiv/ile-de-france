@@ -14,7 +14,9 @@ SOURCE = "codes_%d/reference_IRIS_geo%d.xls" % (YEAR, YEAR)
 def configure(context):
     context.config("data_path")
 
-    context.config("regions", [11])
+    # Modified to consider the entire territory
+    #context.config("regions", [11])
+    context.config("regions", [])
     context.config("departments", [])
 
 def execute(context):

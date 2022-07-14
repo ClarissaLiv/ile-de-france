@@ -18,6 +18,7 @@ def execute(context):
     requested_communes = set(df_codes["commune_id"].unique())
 
     excess_communes = set(df_bdtopo["commune_id"].unique()) - requested_communes
+    
     if len(excess_communes) > 0:
         raise RuntimeError("Excess municipalities in BDTOPO")
 

@@ -13,8 +13,8 @@ def configure(context):
     context.config("data_path")
     
     # Take all zones into account
-    context.config("census_path", "rp_2015/FD_INDCVIZA_2015.dbf")    
-    #context.config("census_path", "rp_2015/FD_INDCVI_2015.dbf")
+    #context.config("census_path", "rp_2015/FD_INDCVIZA_2015.dbf")    
+    context.config("census_path", "rp_2015/FD_INDCVI_2015.dbf")
 
 COLUMNS = [
     "CANTVILLE", "NUMMI", "AGED",

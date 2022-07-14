@@ -1,5 +1,6 @@
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 import shapely.geometry as geo
 import os, datetime, json
 
@@ -148,7 +149,7 @@ def execute(context):
     ]
 
     df_spatial = df_spatial.drop(columns = ["home_geometry", "work_geometry"])
-    df_spatial.to_file("%s/%scommutes.gpkg" % (output_path, output_prefix), driver = "GPKG")
+    #df_spatial.to_file("%s/%scommutes.gpkg" % (output_path, output_prefix), driver = "GPKG")
 
     # Write spatial trips
     df_spatial = pd.merge(df_trips, df_locations[[
@@ -164,6 +165,11 @@ def execute(context):
         "activity_index": "following_activity_index",
         "geometry": "following_geometry"
     }), how = "left", on = ["person_id", "following_activity_index"])
+    
+    df_missing = df_spatial[(df_spatial["preceding_geometry"].isna()) | (df_spatial["following_geometry"].isna())]
+    print(len(df_spatial))
+    df_spatial = df_spatial[~df_spatial["person_id"].isin(np.unique(df_missing["person_id"].values.tolist()))]
+    print(len(df_spatial))
 
     df_spatial["geometry"] = [
         geo.LineString(od)

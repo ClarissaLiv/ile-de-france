@@ -57,6 +57,8 @@ def execute(context):
         indices = np.repeat(np.arange(weights.shape[0]), random.multinomial(len(df_target), weights))
         df_target["commune_id"] = df_candidates.reset_index()["commune_id"].iloc[indices].values
 
+        df_households["commune_id"] = df_households["commune_id"].astype(str)
+        df_target["commune_id"] = df_target["commune_id"].astype(str)
         df_households.loc[df_target.index, "commune_id"] = df_target["commune_id"]
 
     # Fix missing IRIS (we select from those with <200 inhabitants)
@@ -85,6 +87,9 @@ def execute(context):
 
         indices = np.repeat(np.arange(weights.shape[0]), random.multinomial(len(df_target), weights))
         df_target["iris_id"] = df_candidates.reset_index()["iris_id"].iloc[indices].values
+        
+        df_households["iris_id"] = df_households["iris_id"].astype(str)
+        df_target["iris_id"] = df_target["iris_id"].astype(str)
 
         df_households.loc[df_target.index, "iris_id"] = df_target["iris_id"]
 

@@ -14,8 +14,11 @@ SOURCE = "codes_%d/reference_IRIS_geo%d.xls" % (YEAR, YEAR)
 def configure(context):
     context.config("data_path")
 
-    context.config("regions", [11])
-    context.config("departments", [])
+    # Modified to create the population for the entire territory
+    #context.config("regions", [11])
+    context.config("regions", [])
+    #context.config("departments", [])
+    context.config("departments", ["0" + str(i) for i in range(1, 10)] + [i for i in range(10,96)] + ["2A", "2B"])
 
 def execute(context):
     # Load IRIS registry

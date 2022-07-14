@@ -10,11 +10,11 @@ This stage cleans the French population census:
 """
 
 def configure(context):
-    context.stage("data.census.raw")
+    context.stage("data.census.raw_longDistance")
     context.stage("data.spatial.codes")
 
 def execute(context):
-    df = pd.read_hdf("%s/census.hdf" % context.path("data.census.raw"))
+    df = pd.read_hdf("%s/census.hdf" % context.path("data.census.raw_longDistance"))
 
     # Construct household IDs for persons with NUMMI != Z
     df_household_ids = df[["CANTVILLE", "NUMMI"]]
@@ -105,8 +105,8 @@ def execute(context):
     df["socioprofessional_class"] = df["CS1"].astype(np.int)
 
     # Place of work or education
-    df["work_outside_region"] = df["ILT"].isin(("4", "5", "6"))
-    df["education_outside_region"] = df["ILETUD"].isin(("4", "5", "6"))
+    #df["work_outside_region"] = df["ILT"].isin(("4", "5", "6"))
+    #df["education_outside_region"] = df["ILETUD"].isin(("4", "5", "6"))
 
     # Consumption units
     df = pd.merge(df, hts.calculate_consumption_units(df), on = "household_id")
@@ -117,7 +117,7 @@ def execute(context):
         "age", "sex", "couple",
         "commute_mode", "employed",
         "studies", "number_of_vehicles", "household_size",
-        "work_outside_region", "education_outside_region",
+        #"work_outside_region", "education_outside_region",
         "consumption_units", "socioprofessional_class"
     ]]
     
