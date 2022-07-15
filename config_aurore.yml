@@ -7,8 +7,10 @@ working_directory: /nas/asallard/Ile-de-France/cache
 # This section defines which parts of the pipeline should be run
 run:
   #- data.bdtopo.raw
-  - synthesis.output # To create the output population in the output_path (see below)
+  #- synthesis.output # To create the output population in the output_path (see below)
   #- matsim.output # Uncomment, if you want to run the full simulation (you'll need Java for that)
+  - jtab_preparation.population_clustering
+  - jtab_preparation.prepare_jtab_outputs
 
 # Here the configuraiton of the pipeline starts
 config:
@@ -25,6 +27,8 @@ config:
   # Paths to the input data and where the output should be stored
   data_path: /nas/asallard/Ile-de-France/Data
   output_path: /nas/asallard/Ile-de-France/output
+  jtab_data_path: /nas/asallard/Ile-de-France/JTAB_data
+  jtab_output_path: /nas/asallard/Ile-de-France/JTAB_output
 
   # Only interesting if you run the simulation
   java_memory: 14G
